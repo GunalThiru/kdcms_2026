@@ -5,3 +5,4 @@ from .complaints import Complaint
 from .complaint_attachments import ComplaintAttachment
 from .feedback import Feedback
 from .complaint_assignment import ComplaintAssignment
+from .reporting_staff import ReportingStaff

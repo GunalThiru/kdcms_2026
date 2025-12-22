@@ -26,13 +26,16 @@ class ComplaintAttachment(db.Model):
         overlaps="attachments"
     )
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "complaint_id": self.complaint_id,
-            "filename": self.filename,
-            "file_path": self.file_path,
-            "file_type": self.file_type,
-            "file_size": self.file_size,
-            "uploaded_at": self.uploaded_at.isoformat()
-        }
+def to_dict(self):
+    full_path = os.path.join("uploads/complaints", self.filename)
+    file_exists = os.path.isfile(full_path)
+    return {
+        "id": self.id,
+        "complaint_id": self.complaint_id,
+        "file_name": self.filename,  # use file_name key to match Angular code
+        "file_type": self.file_type,
+        "file_size": self.file_size,
+        "uploaded_at": self.uploaded_at.isoformat(),
+        "file_url": f"/complaints/uploads/complaints/{self.filename}" if file_exists else None # <-- this makes it accessible
+    }
+

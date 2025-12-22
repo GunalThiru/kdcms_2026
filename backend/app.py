@@ -1,22 +1,34 @@
 from flask import Flask, request, make_response
 from flask_cors import CORS
-from backend.models import db
+from backend.extensions import db, jwt
 from backend.routes import register_routes
-from backend.extensions import db
-from backend.models import User, Complaint, ComplaintAttachment, Feedback, ComplaintAssignment
 
 
 def create_app():
     app = Flask(__name__)
 
-    # DB config
+    # -------------------------------------------------
+    # CONFIG
+    # -------------------------------------------------
     app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/kdmbcms"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # CORS
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    # 🔐 JWT CONFIG (THIS FIXES YOUR ERROR)
+    app.config["JWT_SECRET_KEY"] = "super-secret-key"  # change later
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_HEADER_NAME"] = "Authorization"
+    app.config["JWT_HEADER_TYPE"] = "Bearer"
 
-    # Handle OPTIONS preflight for all routes
+    # -------------------------------------------------
+    # CORS
+    # -------------------------------------------------
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True
+    )
+
+    # Handle OPTIONS preflight
     @app.before_request
     def handle_preflight():
         if request.method == "OPTIONS":
@@ -26,7 +38,15 @@ def create_app():
             response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
             return response
 
+    # -------------------------------------------------
+    # INIT EXTENSIONS
+    # -------------------------------------------------
     db.init_app(app)
+    jwt.init_app(app)   # 🔥 THIS WAS MISSING
+
+    # -------------------------------------------------
+    # ROUTES
+    # -------------------------------------------------
     register_routes(app)
 
     with app.app_context():

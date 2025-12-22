@@ -1,0 +1,74 @@
+Column Name,Description
+PaymentType,The type of transaction. (Such as a payment or a refund)
+PhonePeReferenceId,The unique transaction ID assigned by PhonePe for this transaction.
+Forward Transaction Reference Id,For refunds; the reference ID of the original payment transaction; otherwise; this is blank.
+Forward Merchant Transaction Id,For refunds; the merchant’s transaction ID of the original payment; otherwise; this is blank.
+MerchantOrderId,The merchant’s order ID for this transaction
+From,The sender’s name; usually “PhonePe Private Limited”.
+StoreId,The unique ID of the store where the transaction happened.
+StoreName,The name of the store (or store ID if name is missing)
+TerminalId,The unique ID of the terminal (device) used for the transaction.
+TerminalName,The name of the terminal (or terminal ID if name is missing)
+DisplayName,Blank column; possibly reserved for future use or customization.
+CustomerName,The name of the customer who made the payment or received the refund.
+Customer Remarks,Blank column; possibly reserved for customer comments or notes.
+Card Issuer,The name of the bank or company that issued the credit/debit card used in the transaction.
+Bank Id,The ID of the bank associated with the card used in the transaction.
+Card Type,The type of card used (e.g.; CREDIT_CARD / DEBIT_CARD / RUPAY_CREDIT_CARD).
+Order BIN Country,The country of the card's issuing bank (always set to "INDIA" here).
+MaskedVPA,The masked Virtual Payment Address (VPA) used for the transaction.
+Sale Amount,The total sale amount for the transaction.
+UPI Amount,The amount paid using UPI (Unified Payments Interface) or external VPA.
+External Wallet Amount,The amount paid using an external wallet (not UPI or card).
+IGST,Integrated Goods and Services Tax applied to the transaction.
+SGST,State Goods and Services Tax applied to the transaction.
+CGST,Central Goods and Services Tax applied to the transaction.
+GST,The total GST (sum of IGST; SGST; and CGST).
+Net Amount,The net amount after deducting GST from the total amount.
+OriginalTransactionDate,For refunds; the date of the original payment transaction; otherwise blank.
+SettlementDate,The date when the transaction was settled (in IST; formatted as dd-MM-yyyy).
+Instrument,The payment instrument used (e.g.; CC; DC; EGV; RCC; UPI; Wallet).
+Transaction UTR,The Unique Transaction Reference (UTR) number for the payment or refund.
+Settlement UTR,The UTR number for the settlement of the transaction.
+Partner Id,The name of the partner; always set as "PhonePe".
+Loan Id,The unique ID of the loan associated with the transaction.
+Request Id,The unique ID of the loan request or application.
+UTR Number,The Unique Transaction Reference (UTR) number for this transaction.
+Transaction Date,The date when the transaction took place (formatted as dd-MM-yyyy).
+Source,The payment source for the transaction
+Intent,The purpose of the transaction
+Payment Reference Id,A unique reference number for this payment transaction.
+MerchantReferenceId,A unique ID for the transaction; assigned by the external payment system.
+OriginalMerchantReferenceId,For refunds; the external transaction ID of the original payment; otherwise blank.
+OriginalTransactionId,For refunds; the transaction ID of the original payment; otherwise blank.
+TransactionUTR,The Unique Transaction Reference (UTR) number for the payment or refund.
+CreationDate,The date when the transaction was created (in dd-MM-yyyy format).
+BankReferenceNo,The Unique Transaction Reference (UTR) number for the settlement.
+Amount,The total transaction amount.
+TransactionDate,The date when the transaction actually happened (in day-month-year format).
+Fee,The fee charged for processing the transaction.
+SID,The unique ID of the store where the transaction happened.
+TID,The unique ID of the terminal (device) used for the transaction.
+Ticket Type,The type of ticket issued in the transaction (if applicable); otherwise blank.
+S NO,A serial number for each row in the report; starting from 1.
+Network Order ID,A unique ID for the order or transaction; used to track the purchase or refund.
+Buyer APP ID,The ID of the buyer's app; always set as "PhonePe".
+Seller ID,The ID of the seller; always set as "KMRL".
+Date,The date when the transaction happened; shown in day-month-year format.
+Time,The time when the transaction happened; shown in hours; minutes; and seconds.
+Mobile Number,The mobile number of the person who made the transaction.
+Source (For ONDC),The starting station or location for the ticket or journey.
+Destination,The ending station or location for the ticket or journey.
+Ticket Qty,The number of tickets purchased in the transaction.
+Ticket Id,A unique ID for the ticket issued in the transaction.
+Ticket Status,The current status of the ticket (e.g.; active; cancelled).
+Transaction Ref No,The bank reference number (UTR) for the payment or refund.
+TOTAL AMOUNT,The total amount paid for the transaction.
+Buyer Finder Fee,(Blank column; reserved for future use or extra fees).
+Payment Type,Indicates if the transaction is a payment or a refund.
+Settlement Amount,The amount settled after deducting fees and taxes from the total amount.
+Receiver IFSC,(Blank column; reserved for future use or bank details).
+Collector IFSC,(Blank column; reserved for future use or bank details).
+Settlement Reference Number,The reference number for the settlement transaction.
+UTR Created Date-time,The date when the settlement UTR was created.
+Difference amount,(Blank column; reserved for future use or adjustments).

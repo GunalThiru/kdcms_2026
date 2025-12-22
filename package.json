@@ -1,10 +1,6 @@
 {
-<<<<<<< HEAD
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0"
-  }
-}
-=======
+
+
   "name": "kcms",
   "version": "0.0.0",
   "scripts": {
@@ -52,4 +48,3 @@
     "typescript": "~5.9.2"
   }
 }
->>>>>>> 94968e770da7cd576ad0b554f688102628aff5c5
