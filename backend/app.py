@@ -2,6 +2,7 @@ from flask import Flask, request, make_response
 from flask_cors import CORS
 from backend.extensions import db, jwt
 from backend.routes import register_routes
+from backend.config import config
 
 
 def create_app():
@@ -12,6 +13,18 @@ def create_app():
     # -------------------------------------------------
     app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost/kdmbcms"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
+    # Connection pooling and timeout settings for reliability
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_size": 10,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,  # Test connection before using
+        "connect_args": {
+            "connect_timeout": 10,
+            "read_timeout": 30,
+            "write_timeout": 30,
+        }
+    }
 
     # 🔐 JWT CONFIG (THIS FIXES YOUR ERROR)
     app.config["JWT_SECRET_KEY"] = "super-secret-key"  # change later
@@ -50,7 +63,11 @@ def create_app():
     register_routes(app)
 
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"⚠️  Warning: Could not initialize database: {e}")
+            print("Start MySQL and restart the app to enable database features.")
 
     return app
 

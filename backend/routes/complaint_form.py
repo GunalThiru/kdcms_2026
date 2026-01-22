@@ -1,3 +1,4 @@
+from unittest import result
 import pytz
 from flask import Blueprint, request, jsonify, current_app, send_from_directory, abort
 from backend.models import db, Complaint, ComplaintAttachment
@@ -6,7 +7,14 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 import os, json
 from pathlib import Path
-from sqlalchemy import or_
+from sqlalchemy import or_,cast
+from sqlalchemy.types import String
+from backend.models.complaints import PROBLEM_TYPE_CODE
+from backend.models.users import User
+from sqlalchemy import func 
+from sqlalchemy.orm import aliased
+
+from backend.utils.complaint_email_notifier import notify_on_complaint_submission
 
 
 complaint_bp = Blueprint('complaints', __name__, url_prefix='/complaints')
@@ -35,6 +43,17 @@ def create_complaint():
 
     reported_by = data.get("reported_by")
     is_guest = not reported_by
+    if is_guest:
+        guest_mobile = data.get("guest_mobile")
+        guest_email = data.get("guest_email")
+
+        if not guest_mobile or not guest_mobile.isdigit() or len(guest_mobile) != 10:
+            return jsonify({"error": "Valid guest mobile number is required"}), 400
+
+        if not guest_email:
+            return jsonify({"error": "Guest email is required"}), 400
+    
+
 
     complaint = Complaint(
         date_of_issue=ist_now.date(),
@@ -50,6 +69,8 @@ def create_complaint():
         reported_by=int(reported_by) if reported_by else None,
         is_guest=is_guest,
         reporter_name=data.get("guest_name") if is_guest else None,
+        guest_mobile=data.get("guest_mobile") if is_guest else None,
+        guest_email=data.get("guest_email") if is_guest else None,
         
 
         solution_provided=data.get("solution_provided"),
@@ -65,6 +86,21 @@ def create_complaint():
     db.session.add(complaint)
     db.session.commit()
 
+    # 🔔 trigger email AFTER successful save
+    notify_on_complaint_submission(complaint)
+
+    # generating complaint no
+    problem_code = PROBLEM_TYPE_CODE.get(complaint.problem_type, "OTH")
+
+    #YEAR SUFFIX AND ZERO PAD TO 6 DIGITS
+    year_suffix = ist_now.strftime("%y")   # 26
+    running_id = str(complaint.id).zfill(6)
+
+
+    complaint.complaint_no = f"CMP{problem_code}{year_suffix}{running_id}"
+
+    db.session.commit()
+    
     # -------------------------
     # SAVE ATTACHMENTS
     # -------------------------
@@ -91,6 +127,7 @@ def create_complaint():
     return jsonify({
         "message": "Complaint created successfully",
         "id": complaint.id,
+        "complaint_no": complaint.complaint_no,
         "is_guest": is_guest
     }), 201
 
@@ -141,11 +178,17 @@ def save_staff_action(complaint_id):
     complaint.remarks = data.get("remarks")
     complaint.status_id = status.id
 
+        # 🚫 DO NOT allow resolved fields here
+    complaint.resolved_by = None
+    complaint.solution_date_time = None
+
+
     db.session.commit()
 
     return jsonify({
         "message": "Complaint saved as in-progress",
-        "complaint_id": complaint.id
+        "complaint_id": complaint.id,
+        "complaint_no": complaint.complaint_no
     }), 200
 
 
@@ -215,6 +258,7 @@ def ist_dt():
 
 
 
+
 # -------------------------
 # COMPLAINTS SUMMARY
 # -------------------------
@@ -272,9 +316,19 @@ def complaint_summary():
 # -------------------------
 # FILTERED COMPLAINTS LIST
 # -------------------------
+# -------------------------
+# FILTERED COMPLAINTS LIST
+# -------------------------
+
 @complaint_bp.route('/list', methods=['GET'])
 def list_complaints():
 
+    # ---------- PAGINATION PARAMS ----------
+    page = int(request.args.get("page", 1))
+    page_size = int(request.args.get("page_size", 10))
+    offset = (page - 1) * page_size
+
+    # ---------- FILTER PARAMS ----------
     status_code = request.args.get("status")
     problem_type = request.args.get("problem_type")
     sub_problem_type = request.args.get("sub_problem_type")
@@ -282,29 +336,28 @@ def list_complaints():
     to_date = request.args.get("to_date")
     search = request.args.get("search")
 
-    query = (
-        db.session.query(Complaint)
-        .join(ComplaintStatus)
+    resolver = aliased(User)
+
+    query = db.session.query(
+        Complaint,
+        resolver.name.label("resolver_name")
+    ).outerjoin(
+        resolver,
+        Complaint.resolved_by == resolver.id
     )
 
-    # -------------------------
-    # STATUS FILTER
-    # -------------------------
+    # ---------- STATUS ----------
     if status_code:
-        query = query.filter(ComplaintStatus.code == status_code)
+        query = query.join(ComplaintStatus).filter(ComplaintStatus.code == status_code)
 
-    # -------------------------
-    # PROBLEM TYPE FILTER
-    # -------------------------
+    # ---------- PROBLEM ----------
     if problem_type:
         query = query.filter(Complaint.problem_type == problem_type)
 
     if sub_problem_type:
         query = query.filter(Complaint.sub_problem_type == sub_problem_type)
 
-    # -------------------------
-    # DATE RANGE FILTER
-    # -------------------------
+    # ---------- DATE ----------
     if from_date:
         query = query.filter(
             Complaint.date_of_issue >= datetime.strptime(from_date, "%Y-%m-%d").date()
@@ -315,25 +368,97 @@ def list_complaints():
             Complaint.date_of_issue <= datetime.strptime(to_date, "%Y-%m-%d").date()
         )
 
-    # -------------------------
-    # GLOBAL SEARCH (ALL FIELDS)
-    # -------------------------
+    # ---------- SEARCH ----------
     if search:
         search_like = f"%{search}%"
-        query = query.filter(
-            or_(
-                Complaint.problem_description.ilike(search_like),
-                Complaint.problem_type.ilike(search_like),
-                Complaint.sub_problem_type.ilike(search_like),
-                Complaint.reference_id.ilike(search_like),
-                Complaint.remarks.ilike(search_like),
-                Complaint.solution_provided.ilike(search_like)
+        query = (
+            query
+            .outerjoin(User, Complaint.reported_by == User.id)
+            .filter(
+                or_(
+                    cast(Complaint.id, String).ilike(search_like),
+                    User.name.ilike(search_like),
+                    Complaint.reporter_name.ilike(search_like),
+                    Complaint.problem_description.ilike(search_like),
+                    Complaint.problem_type.ilike(search_like),
+                    Complaint.sub_problem_type.ilike(search_like),
+                    Complaint.reference_id.ilike(search_like),
+                    Complaint.remarks.ilike(search_like),
+                    Complaint.solution_provided.ilike(search_like)
+                )
             )
         )
 
+    # ---------- TOTAL COUNT (IMPORTANT) ----------
+    total = query.count()
 
-    complaints = query.order_by(Complaint.id.desc()).all()
+    # ---------- PAGINATED DATA ----------
+    rows = (
+        query
+        .order_by(Complaint.id.desc())
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
 
-    return jsonify([
-        c.to_dict() for c in complaints
-    ]), 200
+    data = []
+    for complaint, resolved_by_name in rows:
+        row = complaint.to_dict()
+        row["resolved_by_name"] = resolved_by_name
+        data.append(row)
+
+    return jsonify({
+        "data": data,
+        "total": total,
+        "page": page,
+        "page_size": page_size
+    }), 200
+
+
+
+
+#track-complaint_bp
+@complaint_bp.route('/track', methods=['POST'])
+def track_complaint():
+    data = request.get_json()
+
+    complaint_no = data.get('complaint_no')
+    reference_id = data.get('reference_id')
+
+    if not complaint_no or not reference_id:
+        return jsonify({'message': 'Invalid request'}), 400
+
+    complaint = Complaint.query.filter_by(
+        complaint_no=complaint_no,
+        reference_id=reference_id
+    ).first()
+
+    if not complaint:
+        return jsonify({'message': 'Not found'}), 404
+
+    return jsonify({
+        'complaint_id': complaint.id,
+        'complaint_no': complaint.complaint_no,
+        'status': complaint.status.code,
+        'reference_type': complaint.reference_type,
+        'reference_id': complaint.reference_id,
+        'remarks': complaint.remarks,
+'solution_provided': complaint.solution_provided,
+        'solution_date_time': complaint.solution_date_time.strftime('%d %b %Y %H:%M') if complaint.solution_date_time else None,
+        'problem_type': complaint.problem_type,
+        'sub_problem_type': complaint.sub_problem_type,
+
+        'date_of_issue': complaint.date_of_issue.strftime('%d %b %Y'),
+        'reporting_time': complaint.reporting_time.strftime('%H:%M'),
+        'reported_by': complaint.reporter.name if complaint.reporter else complaint.reporter_name,
+        'is_guest': complaint.is_guest, 
+        'problem_description': complaint.problem_description,
+        'created_at': complaint.created_at.strftime('%d %b %Y %H:%M'),  
+        'guest_mobile': complaint.reference_id if complaint.is_guest and complaint.reference_type == 'mobile' else None,
+        'guest_email': complaint.reference_id if complaint.is_guest and complaint.reference_type == 'email' else None,
+        'remarks': complaint.remarks,
+        'solution_provided': complaint.solution_provided,
+        'resolved_by': complaint.resolver.name if complaint.resolver else None,
+        'solution_date_time': complaint.solution_date_time.strftime('%d %b %Y %H:%M') if complaint.solution_date_time else None,
+        # 'updated_at': complaint.updated_at.strftime('%d %b %Y %H:%M')
+    })

@@ -21,7 +21,8 @@ class Config:
     # Maximum upload size: 50MB
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 
-
+    # JWT secret key
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'super-secret-key')
 # -------------------------
 # Development configuration
 # -------------------------

@@ -6,6 +6,17 @@ from sqlalchemy import Enum as PgEnum
 # -------------------------
 # ENUMS
 # -------------------------
+
+PROBLEM_TYPE_CODE = {
+    "bus_service": "BUS",
+    "smartcity_card": "SCC",
+    "ktcl_smart_card": "KSC",
+    "smart_pass": "KSP",
+    "tickets": "TKT",
+    "staff": "STF",
+    "others": "OTH"
+}
+
 problem_type_enum = PgEnum(
     'smartcity_card',
     'ktcl_smart_card',
@@ -54,9 +65,8 @@ sub_problem_type_enum = PgEnum(
 reference_type_enum = PgEnum(
     'app_no',
     'card_no',
-    'email',
     'utr',
-    'mobile',
+    
     name="reference_type_enum"
 )
 
@@ -75,6 +85,7 @@ class Complaint(db.Model):
     __tablename__ = "complaints"
 
     id = db.Column(db.Integer, primary_key=True)
+    complaint_no = db.Column(db.String(20), unique=True, nullable=False)
 
     # Complaint details
     date_of_issue = db.Column(db.Date, nullable=False)
@@ -111,6 +122,8 @@ class Complaint(db.Model):
     # -------------------------
     is_guest = db.Column(db.Boolean, nullable=False, server_default=text("FALSE"))
     reporter_name = db.Column(db.String(100), nullable=True)
+    guest_mobile = db.Column(db.String(15), nullable=True)
+    guest_email = db.Column(db.String(100), nullable=True)
 
     remarks = db.Column(db.Text)
 
@@ -177,6 +190,8 @@ class Complaint(db.Model):
     def to_dict(self, include_resolved_by=True):
         return {
             "id": self.id,
+            "complaint_no": self.complaint_no,
+            
             "date_of_issue": str(self.date_of_issue),
             "reporting_time": str(self.reporting_time),
             "reporting_mode": self.reporting_mode,
@@ -190,10 +205,16 @@ class Complaint(db.Model):
             "problem_description": self.problem_description,
             "solution_provided": self.solution_provided,
             "solution_date_time": self.solution_date_time.isoformat() if self.solution_date_time else None,
-
+             # guest details
             "is_guest": self.is_guest,
+
             "reported_by": self.reported_by,
+
+
             "reporter_name": self.reporter.name if self.reporter else self.reporter_name,
+           
+            "guest_mobile": self.reference_id if self.is_guest and self.reference_type == 'mobile' else None,
+            "guest_email": self.reference_id if self.is_guest and self.reference_type == 'email' else None,
 
             **({"resolved_by": self.resolved_by} if include_resolved_by else {}),
 

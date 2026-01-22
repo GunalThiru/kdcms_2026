@@ -2,9 +2,16 @@ from flask import Blueprint, request, jsonify
 from backend.extensions import db
 from backend.models.users import User
 from datetime import datetime, timezone
+from flask_jwt_extended import create_access_token
+from sqlalchemy.exc import IntegrityError
+import pytz
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
 
+# helper
+def ist_dt():
+    
+    return datetime.now(pytz.timezone("Asia/Kolkata")).replace(tzinfo=None)
 # -------------------------
 # Signup Route
 # -------------------------
@@ -50,6 +57,8 @@ def signup():
 # -------------------------
 @auth_bp.route('/login', methods=['POST'])
 def login():
+   
+
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -58,12 +67,16 @@ def login():
 
     if user and user.password_hash == password:
         user.is_online = True
-        user.last_seen = datetime.now(timezone.utc)
+        user.last_seen = ist_dt()
         db.session.commit()
+        
 
-        return jsonify({
+        access_token = create_access_token(identity= str(user.id) )
+
+        return jsonify({    
             'message': 'Login successful!',
-            'user': user.to_dict()
+            'user': user.to_dict(),
+            'access_token': access_token
         }), 200
 
     return jsonify({'message': 'Invalid credentials'}), 401
@@ -73,6 +86,7 @@ def login():
 # Logout Route
 # -------------------------
 @auth_bp.route('/logout', methods=['POST'])
+
 def logout():
     data = request.get_json()
     user_id = data.get("user_id")
@@ -82,7 +96,7 @@ def logout():
         return jsonify({"error": "User not found"}), 404
 
     user.is_online = False
-    user.last_seen = datetime.now(timezone.utc)
+    user.last_seen = ist_dt()
     db.session.commit()
 
     return jsonify({"message": "Logged out successfully"}), 200

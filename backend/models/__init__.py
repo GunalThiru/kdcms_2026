@@ -6,3 +6,5 @@ from .complaint_attachments import ComplaintAttachment
 from .feedback import Feedback
 from .complaint_assignment import ComplaintAssignment
 from .reporting_staff import ReportingStaff
+from .complaint_status_master import ComplaintStatus
+from .complaint_views import ComplaintView
