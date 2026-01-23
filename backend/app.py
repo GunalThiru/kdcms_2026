@@ -1,11 +1,24 @@
+import os
+from dotenv import load_dotenv
+load_dotenv() # Loading environment variables from .env file before creating the app
+    
+
+print("MAIL_USERNAME =", os.environ.get("MAIL_USERNAME"))
+print("MAIL_PASSWORD =", os.environ.get("MAIL_PASSWORD"))
+
+
 from flask import Flask, request, make_response
 from flask_cors import CORS
-from backend.extensions import db, jwt
+from backend.extensions import db, jwt, mail
 from backend.routes import register_routes
 from backend.config import config
 
 
+
+
+
 def create_app():
+    
     app = Flask(__name__)
 
     # -------------------------------------------------
@@ -32,6 +45,15 @@ def create_app():
     app.config["JWT_HEADER_NAME"] = "Authorization"
     app.config["JWT_HEADER_TYPE"] = "Bearer"
 
+    # 📧 MAIL CONFIG (Load from environment variables)
+    app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
+    app.config["MAIL_USE_TLS"] = True
+    app.config["MAIL_USE_SSL"] = False
+    app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+    app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+    app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER", app.config["MAIL_USERNAME"])
+
     # -------------------------------------------------
     # CORS
     # -------------------------------------------------
@@ -55,7 +77,8 @@ def create_app():
     # INIT EXTENSIONS
     # -------------------------------------------------
     db.init_app(app)
-    jwt.init_app(app)   # 🔥 THIS WAS MISSING
+    jwt.init_app(app)
+    mail.init_app(app)   # 🔥 Initialize Flask-Mail with app config
 
     # -------------------------------------------------
     # ROUTES
@@ -72,7 +95,9 @@ def create_app():
     return app
 
 
+
 app = create_app()
+
 
 if __name__ == "__main__":
     app.run(debug=True)

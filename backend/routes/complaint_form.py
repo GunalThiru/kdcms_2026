@@ -86,8 +86,11 @@ def create_complaint():
     db.session.add(complaint)
     db.session.commit()
 
-    # 🔔 trigger email AFTER successful save
-    notify_on_complaint_submission(complaint)
+    # 🔔 Send email in background (don't block response)
+    from threading import Thread
+    email_thread = Thread(target=notify_on_complaint_submission, args=(complaint,))
+    email_thread.daemon = True
+    email_thread.start()
 
     # generating complaint no
     problem_code = PROBLEM_TYPE_CODE.get(complaint.problem_type, "OTH")
@@ -462,3 +465,18 @@ def track_complaint():
         'solution_date_time': complaint.solution_date_time.strftime('%d %b %Y %H:%M') if complaint.solution_date_time else None,
         # 'updated_at': complaint.updated_at.strftime('%d %b %Y %H:%M')
     })
+
+
+@complaint_bp.route('/<int:complaint_id>/send-mail', methods=['POST'])
+def send_complaint_mail(complaint_id):
+    """Send email notification for a complaint"""
+    try:
+        from backend.services.mail_service import send_complaint_mail as send_mail
+        
+        result = send_mail(
+            complaint_id=complaint_id,
+            sent_by=request.json.get("sent_by") if request.json else None
+        )
+        return jsonify({"message": "Mail sent successfully", "data": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

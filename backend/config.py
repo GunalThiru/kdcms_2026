@@ -1,65 +1,44 @@
 import os
+from dotenv import load_dotenv
 
-# -------------------------
-# Base configuration
-# -------------------------
+load_dotenv()
+
 class Config:
-    """
-    Base configuration class.
-    Contains settings common to all environments.
-    """
-
-    # Disable SQLAlchemy event system (better performance)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Secret key for sessions and security
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'mysecretkey')
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
-    # File upload directory (for complaint attachments)
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
-
-    # Maximum upload size: 50MB
+    # Uploads
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 
-    # JWT secret key
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'super-secret-key')
-# -------------------------
-# Development configuration
-# -------------------------
+    # MAIL
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
+
+
 class DevelopmentConfig(Config):
-    """
-    Configuration for local development.
-    Inherits from Config base class.
-    """
-
-    # Database connection string (YOUR NEW DB NAME)
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost/kdmbcms'
-
-    # Enable debug mode
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:@localhost/kdmbcms"
     DEBUG = True
 
 
-# -------------------------
-# Production configuration
-# -------------------------
 class ProductionConfig(Config):
-    """
-    Production configuration for deployment.
-    """
-
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL',
-        'mysql+pymysql://root:@localhost/kdmbcms'
+        "DATABASE_URL",
+        "mysql+pymysql://root:@localhost/kdmbcms"
     )
-
     DEBUG = False
 
 
-# -------------------------
-# Mode selection
-# -------------------------
 config = {
-    'dev': DevelopmentConfig,
-    'prod': ProductionConfig,
-    'default': DevelopmentConfig
+    "dev": DevelopmentConfig,
+    "prod": ProductionConfig,
+    "default": DevelopmentConfig
 }

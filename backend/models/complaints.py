@@ -183,6 +183,12 @@ class Complaint(db.Model):
         back_populates="complaint",
         overlaps="complaint"
     )
+    email_logs = db.relationship(
+        'ComplaintEmailLog',
+        back_populates='complaint',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
     # -------------------------
     # TO DICT

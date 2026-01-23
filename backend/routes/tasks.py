@@ -216,7 +216,7 @@ def resolve_task(task_id):
         "resolved_by": current_user_id
     }), 200
 
-@task_bp.route('/<int:task_id>/view', methods=['POST'])
+@task_bp.route('/<int:task_id>/view', methods=['GET', 'POST'])
 @jwt_required()
 def view_task(task_id):
     user_id = int(get_jwt_identity())
