@@ -53,7 +53,9 @@ def send_complaint_mail(complaint_id, template_key='complaint_received', sent_by
         'reporter_name': complaint.reporter_name or 'Guest',
         'date_of_issue': complaint.date_of_issue.isoformat() if complaint.date_of_issue else 'N/A',
         'reporting_mode': complaint.reporting_mode or 'N/A',
-        'solution_provided': complaint.solution_provided or 'Pending'
+        'solution_provided': complaint.solution_provided or 'Pending',
+        'guest_mobile': complaint.guest_mobile,
+        'guest_email': complaint.guest_email
     }
 
     # Replace variables in subject and body
@@ -65,11 +67,13 @@ def send_complaint_mail(complaint_id, template_key='complaint_received', sent_by
         body = body.replace(f"{{{{{key}}}}}", str(value))
 
     msg = Message(
-        subject=subject,
-        recipients=[config.to_email],
-        cc=[config.cc_email] if config.cc_email else None,
-        body=body
+    subject=subject,
+    recipients=[config.to_email],
+    cc=[config.cc_email] if config.cc_email else None
     )
+
+    msg.html = body   # 👈 HTML EMAIL
+
 
     # 📎 ATTACH FILES
     attachments = ComplaintAttachment.query.filter_by(complaint_id=complaint_id).all()
