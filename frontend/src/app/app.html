@@ -1,0 +1,102 @@
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="navbar">
+
+  <!-- LEFT SECTION -->
+  <div class="nav-left">
+
+    <!-- ☰ SIDEBAR TOGGLE (ALWAYS VISIBLE) -->
+    <button
+      *ngIf="userRole"
+      class="menu-btn"
+      (click)="sideBarOpen = !sideBarOpen">
+      ☰
+      <span *ngIf="taskCount > 0" class="notification-badge">{{ taskCount }}</span>
+    </button>
+
+    <div class="logo">
+      <a [routerLink]="logoRoute">{{ logoText }}</a>
+    </div>
+  </div>
+
+  <!-- RIGHT NAV - ONLY LOGOUT -->
+  <div class="nav-right">
+    <!-- LOGOUT ONLY -->
+    <ng-container *ngFor="let link of links">
+      <a *ngIf="link.label === 'Logout' && link.action"
+         class="nav-link logout-link"
+         (click)="link.action()">
+        {{ link.label }}
+      </a>
+    </ng-container>
+  </div>
+
+</nav>
+
+<!-- ================= APP BODY ================= -->
+<div class="app-body">
+
+<!-- ===== LEFT SIDEBAR ===== -->
+  <aside
+    *ngIf="userRole"
+    class="sidebar"
+    [class.open]="sideBarOpen">
+
+    <nav class="sidebar-menu">
+      <!-- STAFF/ADMIN SIDEBAR LINKS -->
+      <ng-container *ngIf="userRole === 'staff' || userRole === 'admin' || userRole === 'sub_admin'">
+        <a routerLink="/complaints-list" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          All Complaints
+        </a>
+
+        <a routerLink="/complaints-report" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Reports
+        </a>
+
+        <a routerLink="/tasks" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Tasks
+          <span class="task-badge-sidebar" *ngIf="taskCount > 0">
+            {{ taskCount > 99 ? '99+' : taskCount }}
+          </span>
+        </a>
+
+        <a [routerLink]="['/profile', userId]" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Profile
+        </a>
+      </ng-container>
+
+      <!-- CUSTOMER SIDEBAR LINKS -->
+      <ng-container *ngIf="userRole === 'customer'">
+        <a routerLink="/customer/complaints" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          My Complaints
+        </a>
+
+        <a [routerLink]="['/profile', userId]" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Profile
+        </a>
+
+        <a routerLink="/history" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          History
+        </a>
+      </ng-container>
+
+      <!-- GUEST LINKS -->
+      <ng-container *ngIf="!userRole">
+        <a routerLink="/signup" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Sign Up
+        </a>
+
+        <a routerLink="/login" routerLinkActive="active" (click)="onSidebarLinkClick()">
+          Login
+        </a>
+      </ng-container>
+    </nav>
+
+  </aside>
+ 
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="app-main" [class.shifted]="sideBarOpen">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

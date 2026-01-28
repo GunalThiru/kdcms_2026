@@ -1,0 +1,417 @@
+.table-wrapper,
+.loading,
+.no-data {
+  flex: 1;   /* take remaining space */
+}
+
+
+
+/* =====================================================
+   PAGE BASE
+===================================================== */
+.complaints-page {
+  padding: 16px;
+  background: #f6f8fc;
+  font-family: 'Inter', system-ui, sans-serif;
+  width: 100%;
+  overflow-x: hidden;
+    display: flex;
+  flex-direction: column;
+  min-height: 100vh;   /* full viewport height */
+
+}
+
+/* =====================================================
+   SUMMARY CARDS
+===================================================== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.card.clickable {
+  cursor: pointer;
+}
+
+.card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* =====================================================
+   FILTER SECTION
+===================================================== */
+.filters-container {
+  background: linear-gradient(135deg, #eef2ff, #ecfeff);
+  padding: 14px 16px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+}
+
+.filters-container h3 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-row label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.filter-row select,
+.filter-row input {
+  border: 1px solid #e2e8f0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 12px;
+  min-width: 130px;
+  transition: all 0.2s ease;
+}
+
+.filter-row input[type="text"] {
+  min-width: 180px;
+}
+
+.filter-row select:focus,
+.filter-row input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.filter-row button {
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-row button:hover {
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+
+/* =====================================================
+   TABLE SCROLL WRAPPER (CRITICAL)
+===================================================== */
+.table-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+}
+
+.table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 999px;
+}
+
+/* =====================================================
+   TABLE CORE (NON-COLLAPSING)
+===================================================== */
+.complaints-table {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1400px;
+  width: max-content;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.complaints-table thead th {
+  background: linear-gradient(135deg, #f1f5f9, #e0f2fe);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+/* Cells */
+.complaints-table td {
+  padding: 12px;
+  font-size: 13px;
+  color: #334155;
+  vertical-align: top;
+  white-space: normal;
+  word-break: break-word;
+}
+.complaints-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Rows */
+.complaints-table tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+.complaints-table tbody tr:hover {
+  background: #eef2ff;
+}
+
+/* =====================================================
+   FIXED COLUMN WIDTHS (NEVER COLLAPSE)
+===================================================== */
+.complaints-table th:nth-child(1),
+.complaints-table td:nth-child(1) { width: 70px; min-width: 70px; }
+
+.complaints-table th:nth-child(2),
+.complaints-table td:nth-child(2) { width: 140px; min-width: 140px; }
+
+.complaints-table th:nth-child(3),
+.complaints-table td:nth-child(3) { width: 180px; min-width: 180px; white-space: nowrap; }
+
+.complaints-table th:nth-child(4),
+.complaints-table td:nth-child(4) { width: 160px; min-width: 160px; }
+
+.complaints-table th:nth-child(5),
+.complaints-table td:nth-child(5) { width: 340px; min-width: 340px; }
+
+.complaints-table th:nth-child(6),
+.complaints-table td:nth-child(6) { width: 150px; min-width: 150px; white-space: nowrap; }
+/* DESCRIPTION COLUMN — FIX */
+/* .complaints-table th:nth-child(6),
+.complaints-table td:nth-child(6) {
+  width: 340px;
+  min-width: 340px;
+  max-width: 340px;
+
+  white-space: normal;
+  overflow-wrap: anywhere;   /* MOST IMPORTANT */
+  /* word-break: break-word;
+} */ 
+
+
+
+.complaints-table th:nth-child(7),
+.complaints-table td:nth-child(7) { width: 180px; min-width: 180px; }
+
+.complaints-table th:nth-child(8),
+.complaints-table td:nth-child(8) { width: 120px; min-width: 120px; }
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+.status-badge {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.inprogress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* =====================================================
+   LOADING / EMPTY
+===================================================== */
+.loading,
+.no-data {
+  text-align: center;
+  padding: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+
+/* problem description and solution provided extra styling to stop overflow */
+.expandable-text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-height: none;
+  display: block;
+  visibility: visible;
+  color: inherit;
+  font-size: inherit;
+}
+
+.expandable-text.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 60px;
+}
+
+.view-more-btn {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+}
+
+/* DESCRIPTION */
+.complaints-table td:nth-child(6),
+.complaints-table th:nth-child(6) {
+  width: 400px;
+  min-width: 400px;
+}
+
+/* SOLUTION */
+.complaints-table td:nth-child(9),
+.complaints-table th:nth-child(9) {
+  width: 400px;
+  min-width: 400px;
+}
+.complaints-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* table scroll */
+/* .table-scroll {
+  max-height: calc(100vh - 320px); /* adjust based on filters height */
+  /* overflow-y: auto;
+} */ 
+
+/* PAGINATION */
+
+
+/* ================= PAGINATION ================= */
+
+.pagination {
+  margin-top: auto;            /* 🔥 pushes to bottom */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 16px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+
+  position: sticky;
+  bottom: 0;                   /* sticks if content scrolls */
+  z-index: 10;
+}
+
+
+.pagination button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+}
+
+.pagination span {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+.page-size-select {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+
+/* table-control */
+.table-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0;
+}
+
+.table-controls select {
+  margin: 0 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 14px;
+}

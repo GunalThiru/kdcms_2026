@@ -1,0 +1,80 @@
+<div class="track-container">
+  <h2>Track Complaint Status</h2>
+
+  <input
+    type="text"
+    placeholder="Complaint Number (e.g., CMP...)"
+    [(ngModel)]="complaint_no"
+  />
+
+  <input
+    type="text"
+    placeholder="Reference ID (Mobile / Email / UTR / Card No)"
+    [(ngModel)]="referenceId"
+  />
+
+  <button (click)="track()" [disabled]="loading">
+    {{ loading ? 'Tracking...' : 'Track Status' }}
+  </button>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <div *ngIf="result" class="result">
+    <p>
+      <strong>Status:</strong>
+      <span [ngClass]="'status-' + (result.status?.toLowerCase() || '')">
+        {{ result.status }}
+      </span>
+    </p>
+
+    <p>
+      <strong>Complaint No:</strong>
+      {{ result.complaint_no }}
+    </p>
+
+    <p>
+      <strong>Complaint ID:</strong>
+      {{ result.complaint_id }}
+    </p>
+
+    <p>
+      <strong>Reference ID:</strong>
+      {{ result.reference_id }}
+    </p>
+
+    <p>
+      <strong>Problem Type:</strong>
+      {{ result.problem_type | titlecase }}
+    </p>
+
+    <p>
+      <strong>Problem Description:</strong>
+      {{ result.problem_description }}
+    </p>
+
+    <p>
+      <strong>Created At:</strong>
+      {{ result.created_at }}
+    </p>
+
+    <p *ngIf="result.solution_date_time">
+      <strong>Solution Date:</strong>
+      {{ result.solution_date_time }}
+    </p>
+
+    <p *ngIf="result.remarks">
+      <strong>Remarks:</strong>
+      {{ result.remarks }}
+    </p>
+
+    <p *ngIf="result.solution_provided">
+      <strong>Solution Provided:</strong>
+      {{ result.solution_provided }}
+    </p>
+
+    <p *ngIf="result.resolved_by">
+      <strong>Resolved By:</strong>
+      {{ result.resolved_by }}
+    </p>
+  </div>
+</div>

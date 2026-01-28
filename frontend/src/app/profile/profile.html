@@ -1,0 +1,116 @@
+<!-- profile.component.html -->
+<div class="profile-container" *ngIf="!loading && !error; else statusTemplate">
+  
+  <!-- Header Section -->
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <span class="avatar-initial">{{ (profile.name || 'U')[0].toUpperCase() }}</span>
+    </div>
+    <div class="header-content">
+      <h1>{{ profile.name || 'User' }}</h1>
+      <p class="email-badge">{{ profile.email }}</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <span class="alert-icon">✓</span>
+    {{ successMessage }}
+  </div>
+  <div class="alert alert-error" *ngIf="errorMessage || error">
+    <span class="alert-icon">✕</span>
+    {{ errorMessage || error }}
+  </div>
+
+  <!-- View Mode -->
+  <form *ngIf="!isEditing" class="profile-form">
+    <div class="form-section">
+      <h3 class="section-title">Personal Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <div class="input-display">{{ profile.name || '-' }}</div>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <div class="input-display">{{ profile.gender || '-' }}</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <div class="input-display">{{ profile.dob || '-' }}</div>
+        </div>
+        <div class="form-group">
+          <label>Age</label>
+          <div class="input-display">{{ profile.age || '-' }} years</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">Contact Information</h3>
+      
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-display">{{ profile.email || '-' }}</div>
+      </div>
+      
+      <div class="form-group">
+        <label>Phone Number</label>
+        <div class="input-display">{{ profile.phone || '-' }}</div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="button" class="btn btn-primary" (click)="enableEdit()">
+        <span class="btn-icon">✎</span>
+        Edit Profile
+      </button>
+    </div>
+  </form>
+
+  <!-- Edit Mode -->
+  <form *ngIf="isEditing" class="profile-form editing">
+    <div class="form-section">
+      <h3 class="section-title">Personal Information</h3>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input [(ngModel)]="profile.name" name="name" type="text">
+      </div>
+      
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input [(ngModel)]="profile.phone" name="phone" type="tel">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">Contact Information</h3>
+      
+      <div class="form-group">
+        <label>Email Address</label>
+        <input [(ngModel)]="profile.email" name="email" type="email">
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="button" class="btn btn-success" (click)="saveProfile()">
+        <span class="btn-icon">✓</span>
+        Save
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+        <span class="btn-icon">✕</span>
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+
+<ng-template #statusTemplate>
+  <div class="profile-card loading" *ngIf="loading">Loading...</div>
+  <div class="profile-card error" *ngIf="error">{{ error }}</div>
+</ng-template>

@@ -1,0 +1,223 @@
+<div class="tasks-container">
+
+  <!-- ==================== Filters Section ==================== -->
+  <div class="filters-container">
+    <h3>Filters</h3>
+    <div class="filter-row">
+      
+      <!-- Status Filter -->
+      <label>Status:</label>
+      <select [(ngModel)]="filters.status" (change)="applyFilters()">
+        <option value="">All</option>
+        <option value="PENDING">Pending</option>
+        <option value="IN_PROGRESS">In Progress</option>
+      </select>
+
+      <!-- Problem Type Filter -->
+      <label>Problem Type:</label>
+      <select [(ngModel)]="filters.problem_type" (change)="onProblemChange()">
+        <option value="">All</option>
+        <option *ngFor="let pt of problemTypes" [value]="pt">{{ pt }}</option>
+      </select>
+
+      <!-- Sub-Problem Type Filter -->
+      <label>Sub Problem:</label>
+      <select [(ngModel)]="filters.sub_problem_type" (change)="applyFilters()">
+        <option value="">All</option>
+        <option *ngFor="let spt of subProblemTypes" [value]="spt">{{ spt }}</option>
+      </select>
+
+      <!-- Date Range Filters -->
+      <label>From:</label>
+      <input type="date" [(ngModel)]="filters.from_date" (change)="applyFilters()" />
+      <label>To:</label>
+      <input type="date" [(ngModel)]="filters.to_date" (change)="applyFilters()" />
+
+      <!-- Search -->
+      <label></label>
+      <input type="text" [(ngModel)]="filters.search" placeholder="Search..." (keyup.enter)="applyFilters()" />
+
+      <!-- Reset Filters -->
+      <button type="button" (click)="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <div class="table-controls">
+    <label>
+      Show
+      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option *ngFor="let size of pageSizes" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+      entries
+    </label>
+  </div>
+
+  <h2>Tasks</h2>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    Loading tasks...
+  </div>
+
+  <!-- Error -->
+  <div class="error" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <!-- Empty -->
+  <div class="empty" *ngIf="!loading && tasks.length === 0">
+    No pending tasks 🎉
+  </div>
+
+  <!-- Tasks List -->
+  <div class="task-list" *ngIf="!loading && tasks.length > 0">
+    <div class="task-card" *ngFor="let task of tasks">
+
+      <div class="task-header">
+        <span class="badge pending" *ngIf="task.status === 'PENDING'">New</span>
+        <span class="badge progress" *ngIf="task.status === 'IN_PROGRESS'">In Progress</span>
+        <span class="task-id">{{ task.complaint_no }}</span>
+      </div>
+
+      <div class="task-body">
+        <p class="description">{{ task.problem_description }}</p>
+        <p class="meta">
+          Problem: <strong>{{ task.problem_type }}</strong><br>
+          Sub-Problem: <strong>{{ task.sub_problem_type }}</strong><br>
+          Reported By:<strong>{{ getReporter(task) }}</strong>
+
+      
+          <br>  
+          <!-- Last Viewed and Last Opened At -->
+          Last Viewed By:
+        <strong>{{ task.last_viewed_by || 'Not viewed' }}</strong><br>
+
+
+
+          Last Opened At: <strong>{{ task.last_viewed_at ? (task.last_viewed_at | date:'dd-MM-yyyy, hh:mm a') : 'Not viewed' }}</strong><br>
+        </p>
+      </div>
+
+      <div class="task-footer">
+        <button class="open-btn" (click)="openTask(task)">Open</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!loading && tasks.length > 0">
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1">
+      Previous
+    </button>
+
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages">
+      Next
+    </button>
+  </div>
+
+</div>
+
+<!-- 🔍 Task Details Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal modern-modal">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3>Complaint No: {{ selectedTask?.complaint_no }}</h3>
+      <button class="icon-btn" (click)="closeModal()">✖</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+
+      <!-- INFO GRID (readonly fields) -->
+      <div class="info-grid">
+        <div class="info-box">
+          <span class="label">Status</span>
+          <span class="value status">{{ selectedTask?.status || 'N/A' }}</span>
+        </div>
+
+        <div class="info-box">
+          <span class="label">Problem Type</span>
+          <span class="value">{{ selectedTask?.problem_type || 'N/A' }}</span>
+        </div>
+
+        <div class="info-box">
+          <span class="label">Sub Problem</span>
+          <span class="value">{{ selectedTask?.sub_problem_type || 'N/A' }}</span>
+        </div>
+
+        <div class="info-box">
+          <span class="label">Reported By</span>
+          <span class="value">{{ selectedTask?.reported_by
+          ? selectedTask?.reported_by
+          : selectedTask?.reporter_name
+          ? ('GUEST-' + selectedTask?.reporter_name)
+          : 'N/A'
+          }}
+        </span>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="description-card">
+        <span class="label">Description</span>
+        <p>{{ selectedTask?.problem_description || 'N/A' }}</p>
+      </div>
+
+      <!-- ATTACHMENTS -->
+      <div class="attachments" *ngIf="selectedTask?.attachments?.length">
+        <h4>Attachments</h4>
+        <div class="attachment-list">
+          <a *ngFor="let file of selectedTask?.attachments"
+             class="attachment-item"
+             [href]="file.file_url"
+             target="_blank">
+            <img [src]="file.icon" class="file-icon" />
+            <div>
+              <div class="file-name">{{ file.file_name }}</div>
+              <div class="file-size">{{ file.file_size / 1024 | number:'1.0-2' }} KB</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <p *ngIf="!selectedTask?.attachments?.length" class="no-attachments">No attachments</p>
+
+    </div>
+
+    <!-- SOLUTION PROVIDED -->
+    <div class="solution-card" *ngIf="selectedTask && selectedTask.status !== 'COMPLETED'">
+      <label for="solution">Provide Solution</label>
+      <textarea
+        id="solution"
+        [(ngModel)]="selectedTask.solution_provided"
+        placeholder="Write the solution here..."
+      ></textarea>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button class="btn send-mail"
+              (click)="sendMail()"
+              *ngIf="selectedTask">
+        📧 Send Mail
+      </button>
+      <button class="btn primary"
+              (click)="resolveTask()"
+              *ngIf="selectedTask && selectedTask.status !== 'COMPLETED'">
+        Resolve
+      </button>
+      <button class="btn secondary" (click)="closeModal()">Close</button>
+    </div>  
+    
+  </div>  
+</div> 
