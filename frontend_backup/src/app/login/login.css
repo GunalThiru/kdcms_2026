@@ -1,0 +1,338 @@
+/* ==================== LOGIN PAGE - MODERN SLEEK DESIGN ==================== */
+
+:root {
+  --primary-color: #9ebfef !important;
+  --primary-dark: #4c92fb !important;
+  --success-color: #198754 !important;
+  --light-bg: #f8f9fa !important;
+  --border-color: #e9ecef !important;
+  --text-primary: #1f2937 !important;
+  --text-secondary: #6b7280 !important;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ==================== AUTH CONTAINER ==================== */
+.auth-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 100vh !important;
+  background: linear-gradient(135deg, #ced7ff 0%, #be8def 100%) !important;
+  padding: 20px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+/* ==================== CARD ==================== */
+.card {
+  background: white !important;
+  padding: 40px 32px !important;
+  border-radius: 12px !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  box-shadow: var(--shadow-lg) !important;
+  animation: slideUp 0.4s ease !important;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0 !important;
+    transform: translateY(20px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+/* ==================== HEADING ==================== */
+.card h1 {
+  color: var(--text-primary) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  margin: 0 0 28px 0 !important;
+  text-align: center !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* ==================== ALERTS ==================== */
+.success,
+.error {
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  margin-bottom: 20px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  animation: slideDown 0.3s ease !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  top: auto !important;
+  width: auto !important;
+  min-width: auto !important;
+  max-width: none !important;
+  z-index: auto !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+.success {
+  background: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.error {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+/* ==================== INPUT GROUP ==================== */
+.input-group {
+  position: relative !important;
+  margin-bottom: 16px !important;
+  width: 100% !important;
+}
+
+/* ==================== INPUT FIELDS ==================== */
+.input-group input {
+  width: 100% !important;
+  padding: 12px 14px !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  color: var(--text-primary) !important;
+  background: white !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+}
+
+.input-group input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
+}
+
+.input-group input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+/* ==================== ERROR ICON ==================== */
+.error-icon {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 14px !important;
+  color: #f59e0b !important;
+  pointer-events: none !important;
+}
+
+/* ==================== SUBMIT BUTTON ==================== */
+button[type="submit"] {
+  width: 100% !important;
+  padding: 12px 24px !important;
+  margin-top: 12px !important;
+  margin-bottom: 20px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: var(--shadow-md) !important;
+  min-height: 40px !important;
+}
+
+button[type="submit"]:hover:enabled {
+  box-shadow: var(--shadow-lg) !important;
+  transform: translateY(-2px) !important;
+}
+
+button[type="submit"]:active:enabled {
+  transform: translateY(0) !important;
+}
+
+button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==================== AUTH LINK ==================== */
+.auth-link {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  text-align: center !important;
+}
+
+.auth-link a {
+  color: #667eea !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.auth-link a:hover {
+  color: #764ba2 !important;
+  text-decoration: underline !important;
+}
+
+/* ==================== ALTERNATE ACTION BUTTONS ==================== */
+.alt-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+
+.alt-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+  border: 2px solid !important;
+  cursor: pointer !important;
+  min-height: 40px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+.alt-btn:active {
+  transform: scale(0.98) !important;
+}
+
+/* Guest Complaint button - Blue theme */
+.guest-btn {
+  background: linear-gradient(135deg, #667eea 0%, #667eea 100%) !important;
+  color: white !important;
+  border-color: #667eea !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25) !important;
+}
+
+.guest-btn:hover {
+  background: linear-gradient(135deg, #5a6ad8 0%, #5a6ad8 100%) !important;
+  border-color: #5a6ad8 !important;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Track Complaint button - Green theme */
+.track-btn {
+  background: linear-gradient(135deg, #198754 0%, #198754 100%) !important;
+  color: #198754 !important;
+  border-color: #198754 !important;
+  box-shadow: 0 4px 12px #19875440 !important;
+}
+
+.track-btn:hover {
+  background: linear-gradient(135deg, #16673f 0%, #16673f 100%) !important;
+  border-color: #16673f !important;
+  box-shadow: 0 6px 16px rgba(25, 135, 84, 0.35) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 640px) {
+  .auth-container {
+    padding: 16px !important;
+  }
+
+  .card {
+    padding: 28px 20px !important;
+  }
+
+  .card h1 {
+    font-size: 22px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .input-group input {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  button[type="submit"] {
+    font-size: 13px !important;
+    padding: 10px 16px !important;
+  }
+
+  .auth-link {
+    font-size: 12px !important;
+  }
+
+  .alt-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 24px 16px !important;
+  }
+
+  .card h1 {
+    font-size: 20px !important;
+  }
+
+  .input-group input {
+    padding: 10px 12px !important;
+  }
+}
+.guest-btn {
+  background: var(--light-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.guest-btn:hover {
+  border-color: #667eea !important;
+  background: white !important;
+  color: #667eea !important;
+}
+
+/* Track Complaint button */
+.track-btn {
+  background: var(--light-bg) !important;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.track-btn:hover {
+  background: #dcfce7;
+  transform: translateY(-1px);
+}
+
+/* Mobile friendliness */
+@media (max-width: 480px) {
+  .alt-btn {
+    font-size: 0.9rem;
+    padding: 10px 0;
+  }
+}
+
+
+
+

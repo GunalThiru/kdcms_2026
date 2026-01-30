@@ -198,6 +198,7 @@ openTask(task: any) {
 
 
   this.showModal = true;
+  document.body.classList.add('modal-open');
 }
 
 
@@ -225,6 +226,7 @@ closeModal() {
   this.showModal = false;
   this.selectedTask = null;
   this.wasPendingOnOpen = false;
+  document.body.classList.remove('modal-open');
 }
 
 

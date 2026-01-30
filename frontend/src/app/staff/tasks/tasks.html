@@ -192,7 +192,7 @@
       </div>
       <p *ngIf="!selectedTask?.attachments?.length" class="no-attachments">No attachments</p>
 
-    </div>
+    
 
     <!-- SOLUTION PROVIDED -->
     <div class="solution-card" *ngIf="selectedTask && selectedTask.status !== 'COMPLETED'">
@@ -202,6 +202,7 @@
         [(ngModel)]="selectedTask.solution_provided"
         placeholder="Write the solution here..."
       ></textarea>
+    </div>
     </div>
 
     <!-- FOOTER -->
@@ -220,4 +221,5 @@
     </div>  
     
   </div>  
+
 </div> 

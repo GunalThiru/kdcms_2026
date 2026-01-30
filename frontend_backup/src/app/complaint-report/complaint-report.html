@@ -1,0 +1,23 @@
+<h2>Complaints Report</h2>
+
+<div class="cards">
+  <div class="card">
+    <h3>Total</h3>
+    <p>{{ summary.total }}</p>
+  </div>
+
+  <div class="card clickable" (click)="openList('PENDING')">
+    <h3>Pending</h3>
+    <p>{{ summary.pending }}</p>
+  </div>
+
+  <div class="card clickable" (click)="openList('IN_PROGRESS')">
+    <h3>In Progress</h3>
+    <p>{{ summary.in_progress }}</p>
+  </div>
+
+  <div class="card clickable" (click)="openList('COMPLETED')">
+    <h3>Completed</h3>
+    <p>{{ summary.completed }}</p>
+  </div>
+</div>

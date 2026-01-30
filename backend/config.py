@@ -23,6 +23,10 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
 
+    FAST2SMS_API_KEY = os.getenv("FAST2SMS_API_KEY")
+    FAST2SMS_URL = os.getenv("FAST2SMS_URL")
+    FAST2SMS_SENDER = os.getenv("FAST2SMS_SENDER")
+
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:@localhost/kdmbcms"

@@ -1,0 +1,9 @@
+{
+  "smartcity_card": ["website_recharge","mobile_app_recharge","etim_val_recharge","application","smartcity_card_recharge","lost_card","damaged_card","refund","others"],
+  "ktcl_smart_card": ["website_recharge","mobile_app_recharge","etim_val_recharge","application","lost_card","damaged_card","refund","others"],
+  "smart_pass": ["smart_pass_application","smart_pass_renewal_website","smart_pass_renewal_mobile_app","smart_pass_wallet_recharge","change_personal_details","change_pass_details","refund","lost_pass","damaged_pass","others"],
+  "tickets": ["mobile_ticket_issue","upi_ticket_issue","refund"],
+  "bus_service": ["service_complaint","driver_behaviour","conductor_behaviour","refund"],
+  "staff": ["staff_behaviour","service_delay","refund"],
+  "others": ["refund","general_complaint"]
+}

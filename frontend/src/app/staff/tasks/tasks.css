@@ -1,6 +1,10 @@
 /* =========================
    BASE LAYOUT
 ========================= */
+body.modal-open {
+  overflow: hidden;
+  height: 100vh;
+}
 
 .tasks-container {
   padding: 20px;
@@ -265,13 +269,18 @@ h2 {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  top: 60px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 20px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
+  overflow: hidden;
   z-index: 1100;
 }
 
@@ -295,24 +304,34 @@ h2 {
   padding: 20px 22px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
   animation: fadeIn 0.2s ease-in-out;
-  max-height: 85vh;
-  overflow-y: auto;
+
+  max-height: calc(100vh - 60px); /* header + breathing room */
+
+  /* overflow-y: auto; */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 
-  overflow: hidden;
+  /* overflow: hidden; */
 }
+@media (max-height: 700px) {
+  .modal.modern-modal {
+    max-height: 100vh;
+  }
+}
+
 
 @media (max-width: 640px) {
   .modal.modern-modal {
     width: 100%;
     max-width: 100%;
+    height: calc(100vh - 60px);
     border-radius: 12px;
     padding: 16px;
-    max-height: 90vh;
-    margin-top: 20px;
+    margin-top: 0;
   }
 }
+
 
 /* Header */
 .modal-header {
@@ -358,6 +377,8 @@ h2 {
 
 /* Body */
 .modal-body {
+  flex: 1 1 auto;        /* 🔥 CRITICAL */
+  min-height: 0; 
   overflow-y: auto;
   padding-right: 8px;
   flex: 1;
@@ -379,8 +400,13 @@ h2 {
 /* =========================
    INFO GRID (FIELDS)
 ========================= */
+.info-grid {
+  align-content: start;   /* prevents vertical stretching */
+}
+
 
 .info-grid {
+  
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 14px;
@@ -724,4 +750,26 @@ h2 {
   font-weight: 600;
   color: #475569;
   font-size: 13px;
+}
+
+
+
+@media (max-height: 500px) {
+  .modal.modern-modal {
+    height: 100vh;
+  }
+
+  .modal-footer {
+    position: static;
+    margin-top: 16px;
+    border-top: none;
+  }
+
+   .modal-footer .btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+   .modal-body {
+    min-height: 0;
+  }
 }

@@ -1,0 +1,173 @@
+
+<!-- complaint-list.html -->
+
+<div class="complaints-page">
+
+  <!-- ==================== Filters Section ==================== -->
+  <div class="filters-container">
+    <h3>Filters</h3>
+    <div class="filter-row">
+      
+      <!-- Status Filter -->
+      <label>Status:</label>
+      <select [(ngModel)]="filters.status" (change)="applyFilters()">
+        <option value="">All</option>
+        <option value="PENDING">Pending</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+
+      <!-- Problem Type Filter -->
+      <label>Problem Type:</label>
+      <select [(ngModel)]="filters.problem_type" (change)="onProblemChange()">
+        <option value="">All</option>
+        <option *ngFor="let pt of problemTypes" [value]="pt">{{ pt }}</option>
+      </select>
+
+      <!-- Sub-Problem Type Filter -->
+      <label>Sub Problem:</label>
+      <select [(ngModel)]="filters.sub_problem_type" (change)="applyFilters()">
+        <option value="">All</option>
+        <option *ngFor="let spt of subProblemTypes" [value]="spt">{{ spt }}</option>
+      </select>
+
+      <!-- Date Range Filters -->
+      <label>From:</label>
+      <input type="date" [(ngModel)]="filters.from_date" (change)="applyFilters()" />
+      <label>To:</label>
+      <input type="date" [(ngModel)]="filters.to_date" (change)="applyFilters()" />
+
+      <!-- Search -->
+      <label></label>
+      <input type="text" [(ngModel)]="filters.search" placeholder="Search..." (keyup.enter)="applyFilters()" />
+
+      <!-- Reset Filters -->
+      <button type="button" (click)="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <div class="table-controls">
+  <label>
+    Show
+    <select
+      [(ngModel)]="pageSize"
+      (change)="onPageSizeChange()">
+      <option *ngFor="let size of pageSizes" [value]="size">
+        {{ size }}
+      </option>
+    </select>
+    entries
+  </label>
+</div>
+
+  <!-- ==================== Loading Spinner ==================== -->
+  <div *ngIf="loading" class="loading">
+    Loading complaints...
+  </div>
+<div class="table-wrapper">
+  <!-- ==================== Complaints Table ==================== -->
+   <div class="table-scroll">
+  <table *ngIf="!loading && complaints.length > 0" class="complaints-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Complaint No</th>
+        <th>Date</th>
+        <th>Problem Type</th>
+        <th>Sub Problem</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Reporter</th>
+        <th>Solution</th>
+        <th>Resolved_by</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of complaints">
+        <td>{{ c.id }}</td>
+        <td>{{ c.complaint_no }}</td>
+        <td>{{ c.date_of_issue }} {{ c.reporting_time }}</td>
+        <td>{{ c.problem_type }}</td>
+        <td>{{ c.sub_problem_type }}</td>
+        
+  <!-- DESCRIPTION COLUMN -->
+<td>
+  <div
+    class="expandable-text"
+    [class.collapsed]="!c.descExpanded">
+    {{ c.problem_description }}
+  </div>
+
+  <button
+    class="view-more-btn"
+    *ngIf="c.problem_description?.length > 120"
+    (click)="c.descExpanded = !c.descExpanded">
+    {{ c.descExpanded ? 'View less' : 'View more' }}
+  </button>
+</td>
+
+
+
+
+        
+        
+        <!-- Status badge with navigation -->
+        <td>
+          <span 
+            class="status-badge"
+            [ngClass]="{
+              pending: c.status === 'PENDING',
+              inprogress: c.status === 'IN_PROGRESS',
+              completed: c.status === 'COMPLETED'
+            }"
+            (click)="navigateByStatus(c.status)"
+          >
+            {{ c.status }}
+          </span>
+        </td>
+
+        <td>{{ c.reporter_name || 'Guest' }}</td>
+        <!-- SOLUTION COLUMN -->
+<td>
+  <div
+    class="expandable-text"
+    [class.collapsed]="!c.solutionExpanded">
+    {{ c.solution_provided }}
+  </div>
+
+  <button
+    class="view-more-btn"
+    *ngIf="c.solution_provided?.length > 120"
+    (click)="c.solutionExpanded = !c.solutionExpanded">
+    {{ c.solutionExpanded ? 'View less' : 'View more' }}
+  </button>
+</td>
+
+        <td>{{ c.resolved_by_name || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+
+  <!-- No data -->
+  <div *ngIf="!loading && complaints.length === 0" class="no-data">
+    No complaints found.
+  </div>
+  <div class="pagination">
+  <button
+    (click)="changePage(currentPage - 1)"
+    [disabled]="currentPage === 1">
+    Previous
+  </button>
+
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+  <button
+    (click)="changePage(currentPage + 1)"
+    [disabled]="currentPage === totalPages" 
+    >
+    Next
+  </button>
+</div>
+</div>

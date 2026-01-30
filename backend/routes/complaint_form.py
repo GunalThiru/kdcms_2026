@@ -13,9 +13,11 @@ from backend.models.complaints import PROBLEM_TYPE_CODE
 from backend.models.users import User
 from sqlalchemy import func 
 from sqlalchemy.orm import aliased
-
+from backend.extensions import db
+from backend.models.registered_by_type_master import RegisteredByTypeMaster
 from backend.utils.complaint_email_notifier import notify_on_complaint_submission
-
+from backend.services.sms_service import send_sms
+from threading import Thread
 
 complaint_bp = Blueprint('complaints', __name__, url_prefix='/complaints')
 
@@ -42,8 +44,24 @@ def create_complaint():
     ist_now = datetime.now(ist).replace(tzinfo=None)
 
     reported_by = data.get("reported_by")
-    is_guest = not reported_by
-    if is_guest:
+    
+        
+    guest_type = RegisteredByTypeMaster.query.filter_by(code='guest').first()
+    customer_type = RegisteredByTypeMaster.query.filter_by(code='customer').first()
+    staff_type = RegisteredByTypeMaster.query.filter_by(code='staff').first()
+
+    registered_by_type_id = None
+    is_guest = False
+    guest_mobile = None
+    guest_email = None
+    reporter_name = None
+
+
+
+    # CASE 1: GUEST
+    if not reported_by:
+        registered_by_type_id = guest_type.id
+        is_guest = True
         guest_mobile = data.get("guest_mobile")
         guest_email = data.get("guest_email")
 
@@ -52,7 +70,19 @@ def create_complaint():
 
         if not guest_email:
             return jsonify({"error": "Guest email is required"}), 400
-    
+
+
+    # CASE 2: CUSTOMER LOGIN
+    elif data.get("registered_mode") == "customer":
+        registered_by_type_id = customer_type.id
+        is_guest = False
+
+    # CASE 3: STAFF REGISTERING FOR CUSTOMER
+    elif data.get("registered_mode") == "staff":
+        registered_by_type_id = staff_type.id
+        is_guest = False
+        guest_mobile = data.get("customer_mobile")
+
 
 
     complaint = Complaint(
@@ -69,9 +99,12 @@ def create_complaint():
         reported_by=int(reported_by) if reported_by else None,
         is_guest=is_guest,
         reporter_name=data.get("guest_name") if is_guest else None,
-        guest_mobile=data.get("guest_mobile") if is_guest else None,
-        guest_email=data.get("guest_email") if is_guest else None,
-        
+        guest_mobile=guest_mobile,
+        guest_email=guest_email,
+
+
+
+        registered_by_type_id=registered_by_type_id,
 
         solution_provided=data.get("solution_provided"),
         solution_date_time=(
@@ -87,10 +120,30 @@ def create_complaint():
     db.session.commit()
 
     # 🔔 Send email in background (don't block response)
-    from threading import Thread
-    email_thread = Thread(target=notify_on_complaint_submission, args=(complaint,))
+    
+    # email_thread = Thread(target=notify_on_complaint_submission, args=(complaint,))
+    # email_thread.daemon = True
+    # email_thread.start()
+
+    app = current_app._get_current_object()
+
+    def run_email(complaint_id):
+        with app.app_context():
+            notify_on_complaint_submission(
+                Complaint.query.get(complaint_id)
+            )
+
+    email_thread = Thread(
+        target=run_email,
+        args=(complaint.id,)
+    )
     email_thread.daemon = True
     email_thread.start()
+    
+
+
+
+
 
     # generating complaint no
     problem_code = PROBLEM_TYPE_CODE.get(complaint.problem_type, "OTH")
@@ -101,6 +154,27 @@ def create_complaint():
 
 
     complaint.complaint_no = f"CMP{problem_code}{year_suffix}{running_id}"
+    
+    sms_mobile = get_sms_mobile(complaint)
+    if sms_mobile:
+        sms_message = (
+            f"Your complaint has been registered successfully. "
+            f"Complaint No: {complaint.complaint_no}. "
+            f"KTC"
+        )
+        current_app.logger.warning(
+             f"SMS DEBUG → type={complaint.registered_by_type.code if complaint.registered_by_type else None}, "
+             f"guest_mobile={complaint.guest_mobile}, "
+            f"reported_by={complaint.reported_by}"
+        )
+
+        send_sms(sms_mobile, sms_message)
+        print("SMS MOBILE:", sms_mobile)
+        print("SMS MESSAGE:", sms_message)
+
+
+
+    
 
     db.session.commit()
     
@@ -181,7 +255,7 @@ def save_staff_action(complaint_id):
     complaint.remarks = data.get("remarks")
     complaint.status_id = status.id
 
-        # 🚫 DO NOT allow resolved fields here
+    # 🚫 DO NOT allow resolved fields here
     complaint.resolved_by = None
     complaint.solution_date_time = None
 
@@ -446,7 +520,7 @@ def track_complaint():
         'reference_type': complaint.reference_type,
         'reference_id': complaint.reference_id,
         'remarks': complaint.remarks,
-'solution_provided': complaint.solution_provided,
+        'solution_provided': complaint.solution_provided,
         'solution_date_time': complaint.solution_date_time.strftime('%d %b %Y %H:%M') if complaint.solution_date_time else None,
         'problem_type': complaint.problem_type,
         'sub_problem_type': complaint.sub_problem_type,
@@ -480,3 +554,34 @@ def send_complaint_mail(complaint_id):
         return jsonify({"message": "Mail sent successfully", "data": result}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def get_sms_mobile(complaint):
+    if not complaint.registered_by_type:
+        return None
+
+    code = complaint.registered_by_type.code
+
+    if code == "guest":
+        return complaint.guest_mobile
+
+    if code == "customer":
+        return complaint.reporter.mobile if complaint.reporter else None
+
+    if code == "staff":
+        return complaint.guest_mobile
+
+    return None
+
+    # Guest
+    if complaint.registered_by_type.code == "guest":
+        return complaint.guest_mobile
+
+    # Customer login
+    if complaint.registered_by_type.code == "customer":
+        return complaint.reported_by.mobile if complaint.reported_by else None
+
+    # Staff registering for customer
+    if complaint.registered_by_type.code == "staff":
+        return complaint.guest_mobile
+
+    return None 

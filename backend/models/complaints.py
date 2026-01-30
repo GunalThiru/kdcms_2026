@@ -140,6 +140,13 @@ class Complaint(db.Model):
         server_default=text("NOW()")
     )
 
+    registered_by_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('registered_by_type_master.id'),
+        nullable=False
+    )
+    
+
     # -------------------------
     # RELATIONSHIPS
     # -------------------------
@@ -189,6 +196,11 @@ class Complaint(db.Model):
         lazy='dynamic',
         cascade='all, delete-orphan'
     )
+
+    registered_by_type = db.relationship(
+        'RegisteredByTypeMaster',
+        back_populates='complaints'
+    )   
 
     # -------------------------
     # TO DICT

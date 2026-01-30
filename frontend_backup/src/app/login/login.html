@@ -1,0 +1,39 @@
+<div class="auth-container">
+  <div class="card">
+    <h1>Login </h1>
+
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+    <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+     <div class="input-group">
+  <input type="email" placeholder="Email" [(ngModel)]="email" name="email" required #emailInput="ngModel" />
+  <span *ngIf="emailInput.invalid && emailInput.touched" class="error-icon" title="Email is required!">⚠️</span>
+</div>
+
+<div class="input-group">
+  <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required #passwordInput="ngModel" />
+  <span *ngIf="passwordInput.invalid && passwordInput.touched" class="error-icon" title="Password is required!">⚠️</span>
+</div>
+
+      <button type="submit" [disabled]="loginForm.invalid">Login</button>
+
+      <p class="auth-link">
+        Don’t have an account?
+        <a routerLink="/signup">Sign up here</a>
+        <br><p>or</p><br>
+        <div class="alt-actions">
+  <a routerLink="/guest-complaint" class="alt-btn guest-btn">
+    Continue as Guest
+  </a>
+
+  <a routerLink="/track-complaint" class="alt-btn track-btn">
+    Track Complaint
+  </a>
+</div>
+
+
+     
+    </form>
+  </div>
+</div>

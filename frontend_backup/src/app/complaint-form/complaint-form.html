@@ -1,0 +1,218 @@
+<div class="complaint-form-container">
+  <h2>Register Complaint</h2>
+
+  <form (ngSubmit)="onSubmit(complaintForm)" #complaintForm="ngForm" class="complaint-form">
+
+
+  
+
+
+    <!-- ================= STAFF TOP FIELDS ================= -->
+    <!-- Wrap time & mode in a flex container -->
+    <div *ngIf="isStaff">
+      <div class="staff-top-row">
+        <!-- Reporting Time -->
+        <div class="form-group">
+          <label>Reporting Time</label>
+          <input type="time"
+                 [(ngModel)]="formData.reporting_time"
+                 name="reporting_time"
+                 required />
+        </div>
+
+        <!-- Reporting Mode -->
+        <div class="form-group">
+          <label>Reporting Mode</label>
+          <select [(ngModel)]="formData.reporting_mode"
+                  name="reporting_mode"
+                  required>
+            <option value="">Select</option>
+            <option value="mail">Mail</option>
+            <option value="call">Call</option>
+            <option value="message">Message</option>
+            <option value="app">App</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isGuest || isStaff">
+  <div class="form-group">
+
+      <div class="form-group">
+    <label>Name</label>
+    <input type="text" [(ngModel)]="formData.guest_name" name="guest_name" required />
+  </div>
+
+    <label>Contact Mobile *</label>
+    <input type="tel"
+           [(ngModel)]="formData.guest_mobile"
+           name="guest_mobile"
+           pattern="[0-9]{10}"
+           maxlength="10"
+           required />
+  </div>
+
+  <div class="form-group">
+    <label>Contact Email *</label>
+    <input type="email"
+           [(ngModel)]="formData.guest_email"
+           name="guest_email"
+           required />
+  </div>
+</div>
+
+
+    <!-- ================= COMMON FIELDS FOR BOTH ================= -->
+
+    <!-- Problem Type -->
+    <div class="form-group">
+      <label>Problem Type</label>
+      <select [(ngModel)]="formData.problem_type"
+              name="problem_type"
+              required
+              (change)="onProblemTypeChange()">
+        <option value="">Select Problem Type</option>
+        <option *ngFor="let p of problemTypes" [value]="p">{{ p }}</option>
+      </select>
+    </div>
+
+    <!-- Sub Problem Type -->
+    <div class="form-group">
+      <label>Sub Problem Type</label>
+      <select [(ngModel)]="formData.sub_problem_type"
+              name="sub_problem_type"
+              required>
+        <option value="">Select</option>
+        <option *ngFor="let sp of subProblemTypes" [value]="sp">{{ sp }}</option>
+      </select>
+    </div>
+
+    <!-- Reference Type -->
+    <div class="form-group">
+      <label>Reference Type</label>
+      <select [(ngModel)]="formData.reference_type"
+              name="reference_type"
+              required>
+        <option value="">Select</option>
+        <option value="app_no">App Number</option>
+        <option value="card_no">Card Number</option>
+        
+        <option value="utr">UTR</option>
+        
+      </select>
+    </div>
+
+    <!-- Reference ID -->
+    <div class="form-group">
+      <label>Reference ID</label>
+      <input type="text"
+             [(ngModel)]="formData.reference_id"
+             name="reference_id"
+             required />
+    </div>
+
+    <!-- Problem Description -->
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="problem_description"
+                [(ngModel)]="formData.problem_description"
+                required></textarea>
+    </div>
+
+    <!-- Attachments -->
+    <div class="form-group">
+      <label>Attachments</label>
+      <p class="file-hint">Allowed: Images, Videos, PDF,Text</p>
+      <input type="file" #fileInput (change)="onFileChange($event)" multiple>
+      <div class="file-preview-container">
+        <div class="file-box" *ngFor="let f of selectedFiles; let i = index">
+          <img [src]="getIconForFile(f.name)" class="file-icon" />
+          <div class="file-text">
+            <span class="file-name">{{ f.name }}</span>
+            <span class="file-size">{{ (f.size / 1024) | number : '1.0-1' }} KB</span>
+          </div>
+          <button class="remove-small" (click)="removeFile(i)">✖</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAFF BOTTOM FIELDS ================= -->
+    <div *ngIf="isStaff">
+      <h3>Staff Actions</h3>
+
+      <!-- Reported By -->
+      <div class="form-group">
+        <label>Reported By</label>
+        <select [(ngModel)]="formData.reported_by" name="reported_by" required>
+          <option value="" disabled>Select Reporter</option>
+          <option *ngFor="let u of reportingStaff" [value]="u.user_id">
+            {{ u.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Solution Provided -->
+      <div class="form-group">
+        <label>Solution Provided</label>
+        <textarea [(ngModel)]="formData.solution_provided"
+                  name="solution_provided"></textarea>
+      </div>
+
+      <!-- Remarks -->
+      <div class="form-group">
+        <label>Remarks</label>
+        <textarea [(ngModel)]="formData.remarks"
+                  name="remarks"></textarea>
+      </div>
+    </div>
+
+
+    <div class="form-actions">
+      <div class="action-btn-row" *ngIf="isStaff">
+        <button
+          type="button"
+          class="action-btn save"
+          (click)="saveComplaint(false)">
+          Save Complaint
+        </button>
+        <button
+  type="button"
+  class="action-btn mail"
+  (click)="sendMail()">
+  📧 Send Mail
+</button>
+
+
+        <button
+          type="button"
+          class="action-btn resolve"
+          (click)="saveComplaint(true)">
+          Resolve Complaint
+        </button>
+      </div>
+
+      <!-- Normal user submit -->
+     
+    </div>
+
+     <button
+        type="submit"
+        class="submit-btn primary"
+        *ngIf="!isStaff"
+        [disabled]="!complaintForm.form.valid">
+        Submit Complaint
+      </button>
+
+  </form>
+</div>
+
+<!-- Success message -->
+<div *ngIf="successMessage" class="alert-message success" (click)="clearMessages()">
+  {{ successMessage }}
+</div>
+
+<!-- Error message -->
+<div *ngIf="errorMessage" class="alert-message error" (click)="clearMessages()">
+  {{ errorMessage }}
+</div>
