@@ -18,14 +18,14 @@
   justify-content: center !important;
   align-items: center !important;
   min-height: 100vh !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #ced7ff 0%, #be8def 100%) !important;
   padding: 20px !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
 }
 
 /* ==================== CARD ==================== */
 .card {
-  background: white !important;
+  background: rgb(255, 255, 255) !important;
   padding: 40px 32px !important;
   border-radius: 12px !important;
   max-width: 420px !important;
